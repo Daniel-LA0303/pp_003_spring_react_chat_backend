@@ -1,4 +1,4 @@
-package com.mx.mcsv.ecommerce.comunes.enums;
+package com.la.web.chat.utils.enums;
 
 /**
  * method enum

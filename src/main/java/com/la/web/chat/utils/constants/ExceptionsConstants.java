@@ -1,4 +1,4 @@
-package com.mx.mcsv.ecommerce.comunes.constants;
+package com.la.web.chat.utils.constants;
 
 /**
  * constants excpetions

@@ -1,7 +1,7 @@
-package com.mx.mcsv.ecommerce.comunes.mappers;
+package com.la.web.chat.utils.mappers;
 
-import com.mx.mcsv.ecommerce.comunes.constants.ExceptionsConstants;
-import com.mx.mcsv.ecommerce.comunes.enums.ResponseStatus;
+import com.la.web.chat.utils.constants.ExceptionsConstants;
+import com.la.web.chat.utils.enums.ResponseStatus;
 
 /**
  * message formatter

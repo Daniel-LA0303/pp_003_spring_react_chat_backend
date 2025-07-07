@@ -1,8 +1,8 @@
-package com.mx.mcsv.ecommerce.comunes.response;
+package com.la.web.chat.utils.response;
 
 import java.time.LocalDateTime;
 
-import com.mx.mcsv.ecommerce.comunes.enums.MethodEnum;
+import com.la.web.chat.utils.enums.MethodEnum;
 
 /**
  * general api response

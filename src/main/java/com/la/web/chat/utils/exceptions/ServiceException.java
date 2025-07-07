@@ -1,8 +1,8 @@
-package com.mx.mcsv.ecommerce.comunes.excepciones;
+package com.la.web.chat.utils.exceptions;
 
 import java.util.Map;
 
-import com.mx.mcsv.ecommerce.comunes.enums.MethodEnum;
+import com.la.web.chat.utils.enums.MethodEnum;
 
 /**
  * service exception

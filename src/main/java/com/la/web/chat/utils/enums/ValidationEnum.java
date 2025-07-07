@@ -1,6 +1,6 @@
-package com.mx.mcsv.ecommerce.comunes.enums;
+package com.la.web.chat.utils.enums;
 
-import com.mx.mcsv.ecommerce.comunes.constants.RegexConstants;
+import com.la.web.chat.utils.constants.RegexConstants;
 
 /**
  * validation enum
