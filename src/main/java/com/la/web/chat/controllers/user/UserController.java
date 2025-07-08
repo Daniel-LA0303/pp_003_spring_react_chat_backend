@@ -17,8 +17,14 @@ import com.la.web.chat.config.security.JwtUtil;
 import com.la.web.chat.config.security.TokenJwtConfig;
 import com.la.web.chat.model.User;
 import com.la.web.chat.services.user.UserService;
+import com.la.web.chat.utils.constants.PathsConstants;
 import com.la.web.chat.utils.dtos.auth.LoginUserDTO;
 import com.la.web.chat.utils.dtos.auth.UserDTO;
+import com.la.web.chat.utils.enums.MethodEnum;
+import com.la.web.chat.utils.enums.ResponseStatus;
+import com.la.web.chat.utils.exceptions.ServiceException;
+import com.la.web.chat.utils.mappers.MessageFormatter;
+import com.la.web.chat.utils.response.ApiResponse;
 
 @RestController
 @RequestMapping("/users")
@@ -48,30 +54,40 @@ public class UserController {
 	}
 
 	@PostMapping("/login")
-	public ResponseEntity<?> loginUser(@RequestBody LoginUserDTO loginUserDTO) {
-		try {
-			User authenticatedUser = userService.loginUser(loginUserDTO);
-			String token = jwtUtil.generateToken(authenticatedUser.getEmail());
+	public ResponseEntity<?> loginUser(@RequestBody LoginUserDTO loginUserDTO) throws ServiceException {
+		// 1. Autenticar al usuario (puede lanzar ServiceException)
+		User authenticatedUser = userService.loginUser(loginUserDTO);
 
-			return ResponseEntity.ok().header(TokenJwtConfig.SECRET_KEY, TokenJwtConfig.PREFIX_TOKEN + token)
-					.body(Map.of("token", token, "username", authenticatedUser.getUsername()));
-		} catch (RuntimeException e) {
-			return buildErrorResponse(e.getMessage(), HttpStatus.UNAUTHORIZED);
-		}
+		// 2. Generar token JWT
+		String token = jwtUtil.generateToken(authenticatedUser.getEmail());
+
+		// 3. Construir respuesta estructurada con ApiResponse
+		ApiResponse<Map<String, String>> apiResponse = new ApiResponse<>(ResponseStatus.SUCCESS.getHttpStatusCode(), // Código
+																														// 200
+				PathsConstants.PATH_AUTH, // Ej: "/api/login"
+				MethodEnum.POST, MessageFormatter.formatMessage(ResponseStatus.SUCCESS, "Login exitoso"),
+				Map.of("token", token, "username", authenticatedUser.getUsername()), false);
+
+		// 4. Devolver respuesta con header de autenticación
+		return ResponseEntity.ok().header(TokenJwtConfig.SECRET_KEY, TokenJwtConfig.PREFIX_TOKEN + token)
+				.body(apiResponse);
 	}
 
 	@PostMapping("/register")
-	public ResponseEntity<?> registerUser(@RequestBody UserDTO userDTO) {
-		try {
-			User createdUser = userService.createUser(userDTO);
-			String token = jwtUtil.generateToken(createdUser.getEmail());
+	public ResponseEntity<?> registerUser(@RequestBody UserDTO userDTO) throws ServiceException {
+		// 1. Crear usuario y generar token
+		User createdUser = userService.createUser(userDTO); // Puede lanzar ServiceException
+		String token = jwtUtil.generateToken(createdUser.getEmail());
 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					.header(TokenJwtConfig.SECRET_KEY, TokenJwtConfig.PREFIX_TOKEN + token)
-					.body(Map.of("user", createdUser, "token", token));
-		} catch (RuntimeException e) {
-			return buildErrorResponse(e.getMessage(), HttpStatus.BAD_REQUEST);
-		}
+		// 2. Construir respuesta exitosa
+		ApiResponse<Map<String, Object>> apiResponse = new ApiResponse<>(ResponseStatus.CREATED.getHttpStatusCode(),
+				PathsConstants.PATH_USER, MethodEnum.POST,
+				MessageFormatter.formatMessage(ResponseStatus.CREATED, "User"),
+				Map.of("user", createdUser, "token", token), false);
+
+		// 3. Devolver respuesta con headers
+		return ResponseEntity.status(HttpStatus.CREATED)
+				.header(TokenJwtConfig.SECRET_KEY, TokenJwtConfig.PREFIX_TOKEN + token).body(apiResponse);
 	}
 
 	private ResponseEntity<Map<String, Object>> buildErrorResponse(String message, HttpStatus status) {
