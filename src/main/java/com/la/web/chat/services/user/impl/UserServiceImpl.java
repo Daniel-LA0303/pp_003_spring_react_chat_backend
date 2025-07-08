@@ -30,11 +30,11 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public User createUser(UserDTO userDTO) {
 		if (userRepository.findByEmail(userDTO.getEmail()).isPresent()) {
-			throw new RuntimeException("El email ya está registrado");
+			throw new RuntimeException("This email already exists");
 		}
 
 		if (userRepository.findByUsername(userDTO.getUsername()).isPresent()) {
-			throw new RuntimeException("El nombre de usuario ya existe");
+			throw new RuntimeException("This username already exists");
 		}
 
 		User newUser = new User();
@@ -74,10 +74,10 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public User loginUser(LoginUserDTO loginUserDTO) {
 		User user = userRepository.findByEmail(loginUserDTO.getEmail())
-				.orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+				.orElseThrow(() -> new RuntimeException("User or Email not found"));
 
 		if (!passwordEncoder.matches(loginUserDTO.getPassword(), user.getPassword())) {
-			throw new RuntimeException("Contraseña incorrecta");
+			throw new RuntimeException("Incorrect password");
 		}
 
 		return user;
