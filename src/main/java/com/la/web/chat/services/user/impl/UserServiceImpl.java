@@ -1,5 +1,6 @@
 package com.la.web.chat.services.user.impl;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -82,4 +83,10 @@ public class UserServiceImpl implements UserService {
 
 		return user;
 	}
+
+	@Override
+	public List<User> searchUsers(String query) {
+		return userRepository.searchUsers(query);
+	}
+
 }

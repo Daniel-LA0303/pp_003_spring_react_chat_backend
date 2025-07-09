@@ -1,6 +1,7 @@
 package com.la.web.chat.controllers.user;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.http.HttpStatus;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.la.web.chat.config.security.JwtUtil;
@@ -88,6 +90,17 @@ public class UserController {
 		// 3. Devolver respuesta con headers
 		return ResponseEntity.status(HttpStatus.CREATED)
 				.header(TokenJwtConfig.SECRET_KEY, TokenJwtConfig.PREFIX_TOKEN + token).body(apiResponse);
+	}
+
+	@GetMapping("/search")
+	public ResponseEntity<?> searchUsers(@RequestParam("query") String query) {
+		List<User> matchedUsers = userService.searchUsers(query);
+
+		ApiResponse<List<User>> apiResponse = new ApiResponse<>(ResponseStatus.SUCCESS.getHttpStatusCode(),
+				PathsConstants.PATH_USER, MethodEnum.GET,
+				MessageFormatter.formatMessage(ResponseStatus.SUCCESS, "Found users"), matchedUsers, false);
+
+		return ResponseEntity.ok(apiResponse);
 	}
 
 	private ResponseEntity<Map<String, Object>> buildErrorResponse(String message, HttpStatus status) {

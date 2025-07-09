@@ -1,5 +1,6 @@
 package com.la.web.chat.services.user;
 
+import java.util.List;
 import java.util.Optional;
 
 import com.la.web.chat.model.User;
@@ -16,5 +17,7 @@ public interface UserService {
 	Optional<User> findByEmail(String email) throws ServiceException;
 
 	Optional<User> findByUsername(String username) throws ServiceException;
+
+	List<User> searchUsers(String query);
 
 }
