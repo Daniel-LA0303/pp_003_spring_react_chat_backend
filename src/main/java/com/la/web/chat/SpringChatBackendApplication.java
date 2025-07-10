@@ -5,6 +5,9 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 import io.github.cdimascio.dotenv.Dotenv;
 
+/**
+ * version beta 1.0 backend
+ */
 @SpringBootApplication
 public class SpringChatBackendApplication {
 
