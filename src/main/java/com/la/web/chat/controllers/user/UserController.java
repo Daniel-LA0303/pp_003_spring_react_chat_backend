@@ -68,7 +68,9 @@ public class UserController {
 																														// 200
 				PathsConstants.PATH_AUTH, // Ej: "/api/login"
 				MethodEnum.POST, MessageFormatter.formatMessage(ResponseStatus.SUCCESS, "Login exitoso"),
-				Map.of("token", token, "username", authenticatedUser.getUsername()), false);
+				Map.of("token", token, "username", authenticatedUser.getUsername(), "userId",
+						authenticatedUser.getUserId()),
+				false);
 
 		// 4. Devolver respuesta con header de autenticación
 		return ResponseEntity.ok().header(TokenJwtConfig.SECRET_KEY, TokenJwtConfig.PREFIX_TOKEN + token)
