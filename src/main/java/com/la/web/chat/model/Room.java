@@ -1,6 +1,10 @@
 package com.la.web.chat.model;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 /**
@@ -15,6 +19,9 @@ public class Room {
 
 	private String roomId;
 
+	@DBRef
+	private Set<User> users = new HashSet<>();
+
 	/**
 	 * 
 	 */
@@ -24,10 +31,12 @@ public class Room {
 	/**
 	 * @param id
 	 * @param roomId
+	 * @param users
 	 */
-	public Room(String id, String roomId) {
+	public Room(String id, String roomId, Set<User> users) {
 		this.id = id;
 		this.roomId = roomId;
+		this.users = users;
 	}
 
 	/**
@@ -49,6 +58,15 @@ public class Room {
 	}
 
 	/**
+	 * return the value of the propertie users
+	 *
+	 * @return the users
+	 */
+	public Set<User> getUsers() {
+		return users;
+	}
+
+	/**
 	 * set the value of the proppertie id
 	 *
 	 * @param id the id to set
@@ -64,6 +82,15 @@ public class Room {
 	 */
 	public void setRoomId(String roomId) {
 		this.roomId = roomId;
+	}
+
+	/**
+	 * set the value of the proppertie users
+	 *
+	 * @param users the users to set
+	 */
+	public void setUsers(Set<User> users) {
+		this.users = users;
 	}
 
 }

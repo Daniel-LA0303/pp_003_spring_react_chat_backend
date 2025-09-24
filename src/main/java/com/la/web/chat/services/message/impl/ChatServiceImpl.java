@@ -33,7 +33,7 @@ public class ChatServiceImpl implements ChatService {
 
 	@Override
 	public Message sendMessage(String roomId, MessageRequestDTO messageRequestDTO) {
-		Room room = roomRepository.findByRoomId(roomId);
+		Room room = roomRepository.findByRoomId(roomId).get();
 		if (room == null) {
 			throw new RuntimeException("Room not found!");
 		}

@@ -1,5 +1,7 @@
 package com.la.web.chat.controllers.chat;
 
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,6 +18,10 @@ import com.la.web.chat.model.Message;
 import com.la.web.chat.model.Room;
 import com.la.web.chat.repositories.RoomRepository;
 import com.la.web.chat.services.message.impl.ChatServiceImpl;
+import com.la.web.chat.services.room.impl.RoomServiceImpl;
+import com.la.web.chat.utils.dtos.room.CreateRoomRequest;
+import com.la.web.chat.utils.dtos.room.JoinRoomRequest;
+import com.la.web.chat.utils.exceptions.ServiceException;
 
 @RestController
 @RequestMapping("/api/v1/rooms")
@@ -24,21 +30,24 @@ public class RoomController {
 
 	private final RoomRepository roomRepository;
 	private final ChatServiceImpl chatService;
+	private final RoomServiceImpl roomService;
 
-	public RoomController(RoomRepository roomRepository, ChatServiceImpl chatService) {
+	public RoomController(RoomRepository roomRepository, ChatServiceImpl chatService, RoomServiceImpl roomService) {
 		this.roomRepository = roomRepository;
 		this.chatService = chatService;
+		this.roomService = roomService;
 	}
 
 	@PostMapping
-	public ResponseEntity<?> createRoom(@RequestBody String roomId) {
-		if (roomRepository.findByRoomId(roomId) != null) {
-			return ResponseEntity.badRequest().body("Room already exists!");
-		}
+	public ResponseEntity<?> createRoom(@RequestBody CreateRoomRequest request) throws ServiceException {
+		try {
 
-		Room room = new Room();
-		room.setRoomId(roomId);
-		return ResponseEntity.status(HttpStatus.CREATED).body(roomRepository.save(room));
+			System.out.println("user: " + request.getUserId() + "\n room:" + request.getRoomId());
+			Room room = roomService.createRoom(request.getRoomId(), request.getUserId());
+			return ResponseEntity.status(HttpStatus.CREATED).body(room);
+		} catch (RuntimeException e) {
+			return ResponseEntity.badRequest().body(e.getMessage());
+		}
 	}
 
 	@GetMapping("/{roomId}/messages")
@@ -48,9 +57,41 @@ public class RoomController {
 		return ResponseEntity.ok(messages.getContent());
 	}
 
-	@GetMapping("/{roomId}")
-	public ResponseEntity<?> joinRoom(@PathVariable String roomId) {
-		Room room = roomRepository.findByRoomId(roomId);
-		return room == null ? ResponseEntity.badRequest().body("Room not found!") : ResponseEntity.ok(room);
+	@PostMapping("/private")
+	public ResponseEntity<?> getOrCreatePrivateRoom(@RequestParam String userId1, @RequestParam String userId2) {
+
+		try {
+			Room room = roomService.getOrCreatePrivateRoom(userId1, userId2);
+			return ResponseEntity.ok(room);
+		} catch (ServiceException e) {
+			// return ResponseEntity.status(e.getStatusCode())
+			// .body(new ErrorResponse(e.getMessage(), e.getPath(), e.getMethod()));
+		}
+		return null;
+	}
+
+	@GetMapping("/by-user")
+	public ResponseEntity<?> getRoomsByUser(@RequestParam String userId) throws ServiceException {
+		try {
+			System.out.println("Fetching rooms for user: " + userId);
+			List<Room> rooms = roomService.getRoomsByUserId(userId);
+			return ResponseEntity.ok(rooms);
+		} catch (RuntimeException e) {
+			return ResponseEntity.badRequest().body(e.getMessage());
+		}
+	}
+
+	@PostMapping("/{roomId}/join")
+	public ResponseEntity<?> joinRoom(@PathVariable String roomId, @RequestBody JoinRoomRequest request)
+			throws ServiceException {
+
+		try {
+
+			System.out.println("room: " + roomId + "\n userId: " + request.getUserId());
+			Room room = roomService.joinRoom(roomId, request.getUserId());
+			return ResponseEntity.ok(room);
+		} catch (RuntimeException e) {
+			return ResponseEntity.badRequest().body(e.getMessage());
+		}
 	}
 }
